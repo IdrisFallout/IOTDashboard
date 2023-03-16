@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Charts</title>
+    <script src="../../static/charts/chart.js"></script>
+    <link rel="stylesheet" href="../../static/charts/style.css">
+
+</head>
+<body>
+<div class="title">
+    <h2>My Line Chart</h2>
+    <h2 id="random_value">Value: 0</h2>
+</div>
+<div class="container">
+    <div class="chart-container">
+        <h2 class="title">My Pie Chart</h2>
+        <canvas id="myChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="myLineChart"></canvas>
+    </div>
+</div>
+
+<script>
+    const pieData = {
+        labels: ['Red', 'Blue', 'Yellow'],
+        datasets: [{
+            data: [10, 20, 30],
+            backgroundColor: ['#ff6384', '#36a2eb', '#ffce56']
+        }]
+    };
+
+    const lineData = {
+        labels: [],
+        datasets: [{
+            label: 'Realtime Data',
+            data: [],
+            fill: false,
+            borderColor: 'green',
+            pointRadius: 1, // remove circles
+            borderWidth: 1, // reduce line thickness
+        }]
+    };
+
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Sales',
+                font: {
+                    size: 20
+                }
+            }
+        }
+    };
+
+    const pieCtx = document.getElementById('myChart').getContext('2d');
+    const pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: pieData,
+        options: options
+    });
+
+    const lineCtx = document.getElementById('myLineChart').getContext('2d');
+    const lineChart = new Chart(lineCtx, {
+        type: 'line',
+        data: lineData,
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Real-time data',
+                    font: {
+                        size: 20
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Time'
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Value'
+                    }
+                }
+            }
+        }
+    });
+
+    // Define the maximum number of data points to show before pushing to the left
+    const MAX_DATA_POINTS = 30;
+
+    // Add a new data point to the line chart
+    function addDataPoint(lineChart, time, value) {
+        // Add the new data point to the chart's data
+        lineChart.data.labels.push(time);
+        lineChart.data.datasets[0].data.push(value);
+
+        // If there are more than MAX_DATA_POINTS data points, remove the oldest one
+        if (lineChart.data.labels.length > MAX_DATA_POINTS) {
+            lineChart.data.labels.shift();
+            lineChart.data.datasets[0].data.shift();
+        }
+
+        // Update the chart
+        lineChart.update();
+    }
+
+
+    function getRandomDataValue() {
+        return fetch('/get-random-data-value')
+            .then(response => response.json())
+            .then(data => data.value)
+            .catch(error => console.error(error));
+    }
+
+    function getData(){
+        return fetch('/data')
+            .then(response => response.json())
+            .then(time => data.time)
+            .then(data => data.value)
+    }
+
+    setInterval(async function () {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        const randomValue = await getRandomDataValue();
+        const random_display = document.getElementById('random_value')
+        random_display.innerText = 'Value: ' + randomValue;
+        console.log(lineData.datasets[0].data);
+        {#lineChart.data.labels.push(time);#}
+        {#lineChart.data.datasets[0].data.push(randomValue);#}
+        {#lineChart.update();#}
+        {#addDataPoint(lineChart, time, randomValue);#}
+    }, 2000);
+</script>
+</body>
+</html>
