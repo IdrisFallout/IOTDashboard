@@ -35,8 +35,8 @@ def get_data():
     formatted_time = now.strftime("%I:%M:%S %p")
 
     MAX_DATA_POINTS = 30
-
-    if (x := len(data_points)) > MAX_DATA_POINTS:
+    x = len(data_points)
+    if x > MAX_DATA_POINTS:
         extras = x - MAX_DATA_POINTS
         for i in range(extras):
             try:
