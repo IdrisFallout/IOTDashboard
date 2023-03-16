@@ -106,7 +106,7 @@
     function addDataPoint(lineChart, time, value) {
         // Add the new data point to the chart's data
         lineChart.data.labels.push(time);
-        lineChart.data.datasets[0].data.push(value);
+        lineChart.data.datasets[0].data = value;
 
         // If there are more than MAX_DATA_POINTS data points, remove the oldest one
         if (lineChart.data.labels.length > MAX_DATA_POINTS) {
@@ -126,24 +126,25 @@
             .catch(error => console.error(error));
     }
 
-    function getData(){
+    function getData() {
         return fetch('/data')
             .then(response => response.json())
-            .then(time => data.time)
-            .then(data => data.value)
+            .catch(error => console.error(error));
+
     }
 
     setInterval(async function () {
-        const now = new Date();
-        const time = now.toLocaleTimeString();
-        const randomValue = await getRandomDataValue();
+        const result = await getData()
+        const time = result.time;
+        const randomValue = result.value;
+        console.log(randomValue)
         const random_display = document.getElementById('random_value')
-        random_display.innerText = 'Value: ' + randomValue;
-        console.log(lineData.datasets[0].data);
+        random_display.innerText = 'Value: ' + result.value[result.value.length - 1];
+        {#console.log(lineData.datasets[0].data);#}
         {#lineChart.data.labels.push(time);#}
         {#lineChart.data.datasets[0].data.push(randomValue);#}
         {#lineChart.update();#}
-        {#addDataPoint(lineChart, time, randomValue);#}
+        addDataPoint(lineChart, time, randomValue);
     }, 2000);
 </script>
 </body>
